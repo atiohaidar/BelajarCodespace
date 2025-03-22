@@ -4,27 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Js;
+use JsonException;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse | JsonException
     {
-        $request->validate([
+        //  ini supaya bisa dipake, di header nya yang "Accept" nilainya harus "application/json"
+        $request->validate( [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'role_id' => 'required|exists:roles,id',
         ]);
 
-        $user = User::create([
+        $user = new User([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => $request->role_id,
+            
         ]);
+        $user->role()->associate(Role::find($request->role_id));
+        $user->save();
 
         return response()->json(['message' => 'User registered successfully'], 201);
     }
