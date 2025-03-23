@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,4 +28,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 Route::middleware(['auth:sanctum', 'role:admin'])->get('/admin-only', function () {
     return response()->json(['message' => 'Welcome Admin']);
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/users', [UserController::class, 'index']); // Hanya Admin
+    Route::post('/users', [UserController::class, 'store']); // Hanya Admin
+    Route::get('/users/{user}', [UserController::class, 'show']); // Admin atau Diri Sendiri
+    Route::put('/users/{user}', [UserController::class, 'update']); // Admin atau Diri Sendiri
+    Route::delete('/users/{user}', [UserController::class, 'destroy']); // Hanya Admin
 });
