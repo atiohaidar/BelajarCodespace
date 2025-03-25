@@ -18,6 +18,7 @@ class AuthController extends Controller
         //  ini supaya bisa dipake, di header nya yang "Accept" nilainya harus "application/json"
         $request->validate( [
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'role_id' => 'required|exists:roles,id',
@@ -25,6 +26,7 @@ class AuthController extends Controller
 
         $user = new User([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             

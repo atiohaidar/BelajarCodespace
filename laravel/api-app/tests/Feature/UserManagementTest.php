@@ -5,6 +5,8 @@ use App\Models\User;
 use App\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Hash;
+
 
 class UserManagementTest extends TestCase
 {
@@ -16,6 +18,42 @@ class UserManagementTest extends TestCase
         Role::create(['name' => 'admin']);
         Role::create(['name' => 'user']);
     }
+    public function test_admin_can_create_user()
+    {
+$admin = User::factory()->create(['role_id' => Role::where('name', 'admin')->first()->id]);
+
+        $response = $this->actingAs($admin)->postJson('/api/users', [
+            'name' => 'John Doe',
+            'username' => 'johndoe',
+            'bio' => 'Hello world!',
+            'birthday' => '2000-05-10',
+            'email' => 'johndoe@example.com',
+            'phone' => '081234567890',
+            'nik' => '3201234567890002',
+            'gender' => 'male',
+            'website' => 'https://johndoe.com',
+            'password' => 'password123',
+            'role_id' => 1
+
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', [
+            'name' => 'John Doe',
+            'username' => 'johndoe',
+            'bio' => 'Hello world!',
+            // 'birthday' =>   new DateTime('2000-05-10'),
+            'email' => 'johndoe@example.com',
+            'phone' => '081234567890',
+            'nik' => '3201234567890002',
+            'gender' => 'male',
+            'website' => 'https://johndoe.com',
+            'role_id' => 1
+            ]
+        );
+        
+    }
+
 
     public function test_admin_can_view_all_users()
     {
